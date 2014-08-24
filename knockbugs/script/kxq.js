@@ -6,7 +6,8 @@ var WIDTH;
 var HEIGHT;
 
 // 全局数据
-var bg_list = [undefined, 'floor2.jpg', 'floor5.jpg', 'floor6.jpg', 'floor3.jpg', 'floor4.jpg'];
+var bg_list = [ undefined, 'floor2-2.jpg', 'floor3-2.jpg', 'floor5-2.jpg',
+		'floor6-2.jpg' ];
 var image;
 var brush;
 var gameCount = 0; // 关卡数
@@ -123,7 +124,7 @@ function endGame() {
 }
 
 function setBackground() {
-//	var index = Util.rndRange(0, bg_list.length);
+	// var index = Util.rndRange(0, bg_list.length);
 	var index = gameCount % bg_list.length;
 	var image = bg_list[index] ? 'url(image/' + bg_list[index] + ')' : '';
 	$('html').css('background-image', image);
@@ -194,6 +195,6 @@ function drawWelcomePage() {
 		newGame();
 	};
 	canvas.addEventListener('touchstart', fn);
-	
+
 	resetBackground();
 }
