@@ -6,10 +6,7 @@ var WIDTH;
 var HEIGHT;
 
 // 全局数据
-var bg_img;
-var canvas_pattern;
-var canvas_gradient;
-var bg_list = [undefined, 'floor.png', 'floor2.jpg', 'floor3.jpeg', 'floor4.jpg'];
+var bg_list = [undefined, 'floor2.jpg', 'floor5.jpg', 'floor6.jpg', 'floor3.jpg', 'floor4.jpg'];
 var image;
 var brush;
 var gameCount = 0; // 关卡数
@@ -57,11 +54,6 @@ function init() {
 	// HEIGHT = canvas.height = document.body.clientHeight;
 
 	image = $('#image_source')[0];
-	bg_img = $('#bg_img')[0];
-	canvas_pattern = ctx.createPattern(bg_img, 'repeat');
-	canvas_gradient = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
-	canvas_gradient.addColorStop(0, 'rgb(0, 137, 40)');
-	canvas_gradient.addColorStop(1, 'rgb(0, 137, 143)');
 
 	PopWin.init();
 
