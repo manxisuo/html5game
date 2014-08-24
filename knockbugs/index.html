@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="Viewport"
+	content="width=device-width; height=device-height; user-scaleable=no; initial-scale=1.0" />
+<meta name="apple-touch-fullscreen" content="YES" />
+
+<title>打小强</title>
+
+<style type="text/css">
+html {
+	margin: 0;
+	padding: 0;
+	background: -webkit-gradient(linear, left top, right top, from(rgb(0, 137, 40)
+		), to(rgb(0, 137, 143) ) );
+	background: -moz-linear-gradient(left, rgb(0, 137, 40), rgb(0, 137, 143)
+		);
+}
+
+body {
+	margin: 0 auto;
+	padding: 0;
+	text-align: center;
+}
+
+#image_source,#bg_img {
+	display: none;
+}
+
+#canvas {
+	margin: auto;
+	border: 0px solid gray;
+}
+</style>
+<link type="text/css" href="style/popwin.css" media="all"
+	rel="stylesheet" />
+<script type="text/javascript" src="script/lib/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="script/util.js"></script>
+<script type="text/javascript" src="script/popwin.js"></script>
+<script type="text/javascript" src="script/mylib.js"></script>
+<script type="text/javascript" src="script/kxq-lib.js"></script>
+<script type="text/javascript" src="script/kxq.js"></script>
+
+</head>
+<body onload="init();">
+	<img id="image_source" src="image/xq.png" />
+	<img id="bg_img" src="image/floor.png" />
+	<canvas id="canvas" width="800" height="640"></canvas>
+</body>
+</html>
