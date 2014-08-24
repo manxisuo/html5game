@@ -7,11 +7,12 @@ var HEIGHT;
 
 // 全局数据
 var bg_img;
-var bg_pattern;
-var bg_gradient;
+var canvas_pattern;
+var canvas_gradient;
+var bg_list = [undefined, 'floor.png', 'floor2.jpg', 'floor3.jpeg', 'floor4.jpg'];
 var image;
 var brush;
-var gameCount = 0;
+var gameCount = 0; // 关卡数
 
 // 每次游戏(关卡)的数据
 var bugs = [];
@@ -57,10 +58,10 @@ function init() {
 
 	image = $('#image_source')[0];
 	bg_img = $('#bg_img')[0];
-	bg_pattern = ctx.createPattern(bg_img, 'repeat');
-	bg_gradient = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
-	bg_gradient.addColorStop(0, 'rgb(0, 137, 40)');
-	bg_gradient.addColorStop(1, 'rgb(0, 137, 143)');
+	canvas_pattern = ctx.createPattern(bg_img, 'repeat');
+	canvas_gradient = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
+	canvas_gradient.addColorStop(0, 'rgb(0, 137, 40)');
+	canvas_gradient.addColorStop(1, 'rgb(0, 137, 143)');
 
 	PopWin.init();
 
@@ -115,6 +116,9 @@ function newGame() {
 		bugs.push(makeBug());
 	}
 
+	// 设置背景
+	setBackground();
+
 	// 周期任务
 	timerId = setInterval(draw, INTERVAL);
 
@@ -126,8 +130,19 @@ function endGame() {
 	gameCount = 0;
 }
 
+function setBackground() {
+//	var index = Util.rndRange(0, bg_list.length);
+	var index = gameCount % bg_list.length;
+	var image = bg_list[index] ? 'url(image/' + bg_list[index] + ')' : '';
+	$('html').css('background-image', image);
+}
+
+function resetBackground() {
+	$('html').css('background-image', '');
+}
+
 function draw() {
-	drawBackground();
+	clearCanvas();
 
 	var bug;
 	for ( var i = 0; i < bugs.length; i++) {
@@ -156,9 +171,9 @@ function draw() {
 	}
 }
 
-function drawBackground() {
-	// brush.clear(bg_pattern);
-	// brush.clear(bg_gradient);
+function clearCanvas() {
+	// brush.clear(canvas_pattern);
+	// brush.clear(canvas_gradient);
 	brush.clear();
 }
 
@@ -175,8 +190,8 @@ function drawWelcomePage() {
 	var angle = 0;
 	var timerId = setInterval(function() {
 		angle += Math.PI / 12;
-		drawBackground();
-		brush.fillText('一起打小强', WIDTH / 2 - 125, 100, '50px sans-serif');
+		clearCanvas();
+		brush.strokeText('一起打小强', WIDTH / 2 - 125, 100, '50px sans-serif');
 		brush.image(image, WIDTH / 2, HEIGHT / 2, 200, 200, -Math.PI / 2
 				+ angle);
 	}, 50);
@@ -187,5 +202,6 @@ function drawWelcomePage() {
 		newGame();
 	};
 	canvas.addEventListener('touchstart', fn);
-
+	
+	resetBackground();
 }
