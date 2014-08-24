@@ -5,21 +5,20 @@ var INTERVAL = 50;
 var WIDTH;
 var HEIGHT;
 
+// 全局数据
 var bg_img;
 var bg_pattern;
 var bg_gradient;
 var image;
 var brush;
+var gameCount = 0;
 
+// 每次游戏(关卡)的数据
 var bugs = [];
 var bug_total = 0;
 var currentCount = bug_total;
-var gameCount = 0;
-
-// 游戏状态. true: 运行中, false: 暂停中.
-var running = true;
-
 var timerId;
+var startTime; // 本关卡开始时间
 
 function makeBug() {
 	var x, y;
@@ -118,6 +117,8 @@ function newGame() {
 
 	// 周期任务
 	timerId = setInterval(draw, INTERVAL);
+
+	startTime = new Date().getTime();
 }
 
 // 结束游戏时清理数据
@@ -142,7 +143,9 @@ function draw() {
 	if (currentCount <= 0) {
 		clearInterval(timerId);
 
-		var tip = '恭喜你, 已全部消灭(' + bug_total + '个)! 继续下一关?';
+		var time = Math.floor((new Date().getTime() - startTime) / 1000);
+
+		var tip = '恭喜你, 已全部消灭(共' + bug_total + '个)! 耗时' + time + '秒. 继续下一关?';
 
 		PopWin.show(tip, function() {
 			newGame();
