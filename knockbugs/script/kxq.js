@@ -1,77 +1,89 @@
-var ctx;
 var canvas;
 
 var INTERVAL = 50;
-var WIDTH;
-var HEIGHT;
+var manager;
 
 // 全局数据
-var bg_list = [ undefined, 'floor2-2.jpg', 'floor3-2.jpg', 'floor5-2.jpg',
-		'floor6-2.jpg' ];
+var bg_list = ['floor2-2.jpg', 'floor5-2.jpg', 'floor3-2.jpg', 'floor6-2.jpg'];
 var image;
 var brush;
-var gameCount = 0; // 关卡数
 
 // 每次游戏(关卡)的数据
+var gameCount = 0; // 关卡序号
 var bugs = [];
 var bug_total = 0;
 var currentCount = bug_total;
-var timerId;
 var startTime; // 本关卡开始时间
 
-function makeBug() {
-	var x, y;
-	var type = Util.rndAmong(true, false);
-
-	if (type) {
-		x = Util.rndAmong(0, WIDTH);
-		y = Util.rndRange(0, HEIGHT);
-	} else {
-		x = Util.rndRange(0, WIDTH);
-		y = Util.rndAmong(0, HEIGHT);
-	}
-
-	var angle = Util.getAngle(WIDTH / 2 - x, HEIGHT / 2 - y);
-	var dr = 10;
-	var dx = dr * Math.cos(angle);
-	var dy = dr * Math.sin(angle);
-
-	return new Bug({
-		x : x,
-		y : y,
-		dx : dx,
-		dy : dy,
-		image : image,
-	});
+// 全局初始化
+function main() {
+	init();
+	drawWelcomePage();
 }
 
-// 全局初始化
 function init() {
 	canvas = $('#canvas')[0];
-	ctx = $('#canvas')[0].getContext('2d');
-	WIDTH = canvas.width = window.screen.availWidth;
-	HEIGHT = canvas.height = window.screen.availHeight;
-	// WIDTH = canvas.width = document.body.clientWidth;
-	// HEIGHT = canvas.height = document.body.clientHeight;
+	canvas.width = window.screen.availWidth;
+	canvas.height = window.screen.availHeight;
+	// canvas.width = document.body.clientWidth;
+	// canvas.height = document.body.clientHeight;
 
 	image = $('#image_source')[0];
 
 	PopWin.init();
 
 	brush = new Brush(canvas.getContext('2d'));
+	manager = new AnimationManager(INTERVAL);
+	manager.setClearCanvasFn(function() {
+		brush.clear();
+	});
+}
 
-	// 监听器
-	canvas.addEventListener('touchstart', checkKnock);
+function drawWelcomePage() {
+	var bug = new Bug({
+		x: canvas.width / 2,
+		y: canvas.height / 2,
+		angle: -Math.PI / 2,
+		dx: 1,
+		dy: 1,
+		width: 200,
+		height: 200,
+		image: image,
+	});
 
-	drawWelcomePage();
+	manager.add(function() {
+		brush.strokeText('一起打小强', canvas.width / 2 - 125, 100, '50px sans-serif');
+
+		bug.render(brush);
+		bug.rotate(Math.PI / 20);
+
+	}, Animation.CONTINOUS);
+
+	var fn = function(e) {
+		e.preventDefault();
+
+		manager.clear();
+		canvas.removeEventListener('touchstart', fn);
+		newLevel();
+	};
+
+	canvas.addEventListener('touchstart', fn);
+
+	resetBackground();
+}
+
+// 结束游戏时清理数据
+function endGame() {
+	gameCount = 0;
 }
 
 function checkKnock(e) {
 	e.preventDefault();
 
 	var touch = e.targetTouches[0];
-	var knockedBugs = searchKnockedBug(touch.pageX - canvas.offsetLeft,
-			touch.pageY - canvas.offsetTop);
+	var x = touch.pageX - canvas.offsetLeft;
+	var y = touch.pageY - canvas.offsetTop;
+	var knockedBugs = searchKnockedBug(x, y);
 
 	currentCount -= knockedBugs.length;
 
@@ -79,7 +91,17 @@ function checkKnock(e) {
 		knockedBugs.forEach(function(bug) {
 			bug.markKilled();
 		});
+
+		drawTip('击中' + knockedBugs.length + '个', x, y, 500);
 	}
+}
+
+function drawTip(tip, x, y, period) {
+	manager.add(function() {
+		brush.fillTextWithColor(tip, x, y, 'red', '20px Calibri');
+	}, Animation.PERIOD, {
+		period: period
+	});
 }
 
 function searchKnockedBug(x, y) {
@@ -89,9 +111,10 @@ function searchKnockedBug(x, y) {
 	for ( var i = 0; i < bugs.length; i++) {
 		bug = bugs[i];
 
-		if (!bug.isKilled() & Math.abs(x - bug.x) <= bug.width / 2 + 20
-				&& Math.abs(y - bug.y) <= bug.height / 2 + 20) {
-			results.push(bug);
+		if (!bug.isKilled() & Math.abs(x - bug.x) <= bug.width / 2 + 20) {
+			if (Math.abs(y - bug.y) <= bug.height / 2 + 20) {
+				results.push(bug);
+			}
 		}
 	}
 
@@ -99,7 +122,7 @@ function searchKnockedBug(x, y) {
 }
 
 // 新游戏初始化
-function newGame() {
+function newLevel() {
 	gameCount++;
 	bug_total = gameCount * 2;
 	currentCount = bug_total;
@@ -110,24 +133,80 @@ function newGame() {
 	}
 
 	// 设置背景
-	setBackground();
-
-	// 周期任务
-	timerId = setInterval(draw, INTERVAL);
+	setBackground(gameCount);
 
 	startTime = new Date().getTime();
+
+	// 周期任务
+	manager.add(draw, Animation.CONTINOUS);
+
+	// 增加监听器
+	canvas.addEventListener('touchstart', checkKnock);
 }
 
-// 结束游戏时清理数据
-function endGame() {
-	gameCount = 0;
+function endLevel(totalTime) {
+	// 删除监听器
+	canvas.removeEventListener('touchstart', checkKnock);
+
+	manager.clear();
+
+	var tip = '恭喜你, 已全部消灭(共' + bug_total + '个)! 耗时' + totalTime + '秒. 继续下一关?';
+
+	PopWin.show(tip, function() {
+		newLevel();
+	}, function() {
+		endGame();
+		drawWelcomePage();
+	});
 }
 
-function setBackground() {
-	// var index = Util.rndRange(0, bg_list.length);
-	var index = gameCount % bg_list.length;
-	var image = bg_list[index] ? 'url(image/' + bg_list[index] + ')' : '';
-	$('html').css('background-image', image);
+/**
+ * bug可以为空.
+ */
+function makeBug(bug) {
+	var x, y;
+	var type = Util.rndAmong(true, false);
+
+	if (type) {
+		x = Util.rndAmong(0, canvas.width);
+		y = Util.rndRange(0, canvas.height);
+	}
+	else {
+		x = Util.rndRange(0, canvas.width);
+		y = Util.rndAmong(0, canvas.height);
+	}
+
+	var angle = Util.getAngle(canvas.width / 2 - x, canvas.height / 2 - y);
+	var dr = 10;
+	var dx = dr * Math.cos(angle);
+	var dy = dr * Math.sin(angle);
+
+	var config = {
+		x: x,
+		y: y,
+		dx: dx,
+		dy: dy,
+		image: image,
+	};
+
+	if (bug) {
+		Util.merge(bug, config);
+		return bug;
+	}
+	else {
+		return new Bug(config);
+	}
+}
+
+function setBackground(gameCount) {
+	if (gameCount != 0) {
+		var index = gameCount % bg_list.length;
+		var image = 'url(image/' + bg_list[index] + ')';
+		$('html').css('background-image', image);
+	}
+	else {
+		$('html').css('background-image', '');
+	}
 }
 
 function resetBackground() {
@@ -135,66 +214,28 @@ function resetBackground() {
 }
 
 function draw() {
-	clearCanvas();
-
 	var bug;
 	for ( var i = 0; i < bugs.length; i++) {
 		bug = bugs[i];
 		if (!bug.isKilled()) {
 			if (bug.isOld() && bug.beyondCanvas()) {
-				bugs[i] = makeBug();
+				bugs[i] = makeBug(bug);
 			}
 			drawBug(bugs[i]);
 		}
 	}
 
 	if (currentCount <= 0) {
-		clearInterval(timerId);
-
-		var time = Math.floor((new Date().getTime() - startTime) / 1000);
-
-		var tip = '恭喜你, 已全部消灭(共' + bug_total + '个)! 耗时' + time + '秒. 继续下一关?';
-
-		PopWin.show(tip, function() {
-			newGame();
-		}, function() {
-			endGame();
-			drawWelcomePage();
-		});
+		var totalTime = Math.floor((new Date().getTime() - startTime) / 1000);
+		endLevel(totalTime);
 	}
 }
 
-function clearCanvas() {
-	// brush.clear(canvas_pattern);
-	// brush.clear(canvas_gradient);
-	brush.clear();
-}
-
 function drawBug(bug) {
-	bug.render(brush);
+	bug.render(brush, true);
 
 	if (Math.random() < 0.1) {
 		bug.turn(Util.rndAmong(1, -1) * Math.PI / Util.rndAmong(3, 4, 6));
 	}
 	bug.move();
-}
-
-function drawWelcomePage() {
-	var angle = 0;
-	var timerId = setInterval(function() {
-		angle += Math.PI / 12;
-		clearCanvas();
-		brush.strokeText('一起打小强', WIDTH / 2 - 125, 100, '50px sans-serif');
-		brush.image(image, WIDTH / 2, HEIGHT / 2, 200, 200, -Math.PI / 2
-				+ angle);
-	}, 50);
-
-	var fn = function() {
-		clearInterval(timerId);
-		canvas.removeEventListener('touchstart', fn);
-		newGame();
-	};
-	canvas.addEventListener('touchstart', fn);
-
-	resetBackground();
 }

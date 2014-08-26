@@ -72,6 +72,7 @@
 	 * 填充文字.
 	 */
 	Brush.prototype.fillText = function(text, x, y, font) {
+		var ctx = this.ctx;
 		if (font)
 			ctx.font = font;
 		ctx.fillText(text, x, y);
@@ -80,12 +81,45 @@
 	};
 
 	/**
+	 * 填充指定颜色的文字.
+	 */
+	Brush.prototype.fillTextWithColor = function(text, x, y, color, font) {
+		var ctx = this.ctx;
+		if (font)
+			ctx.font = font;
+
+		ctx.save();
+		ctx.fillStyle = color;
+		ctx.fillText(text, x, y);
+		ctx.restore();
+
+		return this;
+	};
+
+	/**
 	 * 描边文字.
 	 */
 	Brush.prototype.strokeText = function(text, x, y, font) {
+		var ctx = this.ctx;
 		if (font)
 			ctx.font = font;
 		ctx.strokeText(text, x, y);
+
+		return this;
+	};
+
+	/**
+	 * 描边指定颜色的文字.
+	 */
+	Brush.prototype.strokeTextWithColor = function(text, x, y, color, font) {
+		var ctx = this.ctx;
+		if (font)
+			ctx.font = font;
+
+		ctx.save();
+		ctx.strokeStyle = color;
+		ctx.strokeText(text, x, y);
+		ctx.restore();
 
 		return this;
 	};
@@ -138,13 +172,14 @@
 	 * 清空画布.
 	 */
 	Brush.prototype.clear = function(style) {
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		var ctx = this.ctx;
+		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 		if (style) {
 			ctx.save();
 			ctx.fillStyle = style;
-			this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-			this.ctx.fill();
+			ctx.rect(0, 0, this.canvas.width, this.canvas.height);
+			ctx.fill();
 			ctx.restore();
 		}
 
@@ -196,7 +231,8 @@
 		if (len == 3 || len == 4) {
 			w = image.width;
 			h = image.height;
-		} else {
+		}
+		else {
 			w = width;
 			h = height;
 		}
@@ -219,4 +255,159 @@
 
 	window.Brush = Brush;
 
+})(window);
+
+(function(window) {
+
+	/**
+	 * config: times, period, util, afterStop, scope
+	 */
+	function Animation(renderFn, type, config) {
+		this.renderFn = renderFn || function() {
+		};
+		this.type = type || Animation.CONTINOUS;
+
+		this.times = 0;
+		this.period = 0;
+
+		Util.merge(this, config);
+	}
+
+	Animation.CONTINOUS = 1;
+	Animation.TIMES = 2;
+	Animation.PERIOD = 3;
+	Animation.UNTIL = 4;
+
+	function Manager(interval) {
+		this.animations = [];
+		this.timerId = -1;
+		this.running = false;
+		this.clearCanvasFn = null;
+		this.interval = interval == undefined ? 50 : interval;
+	}
+
+	/**
+	 * 增加一个动画.
+	 */
+	Manager.prototype.add = function(renderFn, type, config) {
+
+		var animation;
+
+		if (arguments[0] instanceof Animation) {
+			animation = arguments[0];
+		}
+		else {
+			animation = new Animation(renderFn, type, config);
+		}
+
+		if (animation.type == Animation.PERIOD) {
+			animation.times = animation.period / this.interval;
+		}
+
+		this.animations.splice(0, 0, animation);
+
+		if (!this.running) {
+			this.start();
+		}
+
+		return animation;
+	};
+
+	function checkCompleted(animation) {
+		if (null == animation)
+			return true;
+
+		var complete = false;
+
+		if (animation.type == Animation.PERIOD || animation.type == Animation.TIMES) {
+			if ((animation.times--) == 0) {
+				complete = true;
+			}
+		}
+		else if (animation.type == Animation.UNTIL) {
+			if (animation.util == undefined || animation.util()) {
+				complete = true;
+			}
+		}
+
+		return complete;
+	}
+
+	/**
+	 * 启动动画管理器. 将开始所有动画.
+	 */
+	Manager.prototype.start = function() {
+
+		var me = this;
+		var animations = me.animations;
+
+		var current;
+		if (!me.running && animations.length > 0) {
+			me.timerId = setInterval(function() {
+
+				// 清空画布
+				if (me.clearCanvasFn) {
+					me.clearCanvasFn();
+				}
+
+				// 渲染所有动画的帧. 
+				// 为了能够在循环中删除元素, 所以采用了逆序循环. 而添加元素时, 是放到数组开始的.
+				// 这样一来, 最后添加的动画将会位于顶层.
+				for ( var i = animations.length - 1; i >= 0; i--) {
+					current = animations[i];
+
+					if (checkCompleted(current)) {
+						if (current.afterStop) {
+							current.afterStop.apply(current.scope || window);
+						}
+						animations.splice(i, 1);
+						continue;
+					}
+					else {
+						current.renderFn.apply(current.scope || window);
+					}
+				}
+
+				if (animations.length == 0) {
+					me.stop();
+				}
+
+			}, me.interval);
+
+			me.running = true;
+		}
+	};
+
+	Manager.prototype.stop = function() {
+		var me = this;
+		if (me.running) {
+			clearInterval(me.timerId);
+			me.timerId = -1;
+			me.running = false;
+		}
+	};
+
+	Manager.prototype.setInterval = function(interval) {
+		var me = this;
+		if (me.running) {
+			me.stop();
+			me.interval = interval;
+			me.start();
+		}
+		else {
+			me.interval = interval;
+		}
+	};
+
+	Manager.prototype.clear = function() {
+		this.stop();
+		this.animations = [];
+	};
+
+	Manager.prototype.setClearCanvasFn = function(fn) {
+		this.clearCanvasFn = fn;
+	};
+
+	window.Animation = Animation;
+	window.AnimationManager = Manager;
 })(window);

@@ -5,7 +5,7 @@
 
 	PopWin.init = function() {
 		win = $('<div />').addClass('popwin-win');
-		win.width(300).height(100);
+		win.width(300).height(150);
 		msgField = $('<div />').addClass('popwin-message');
 		okBtn = $('<button />').addClass('popwin-yes').text('Yes');
 		cancelBtn = $('<button />').addClass('popwin-no').text('No');
