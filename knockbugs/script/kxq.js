@@ -1,6 +1,7 @@
 var canvas;
 
 var INTERVAL = 50;
+var SPEED_RATIO = 1.02;
 var manager;
 
 // 全局数据
@@ -137,6 +138,9 @@ function newLevel() {
 
 	startTime = new Date().getTime();
 
+	// 加速
+	manager.speedUp(Math.pow(SPEED_RATIO, gameCount - 1));
+	
 	// 周期任务
 	manager.add(draw, Animation.CONTINOUS);
 
@@ -149,6 +153,9 @@ function endLevel(totalTime) {
 	canvas.removeEventListener('touchstart', checkKnock);
 
 	manager.clear();
+	
+	// 恢复速度
+	manager.restoreSpeed();
 
 	var tip = '恭喜你, 已全部消灭(共' + bug_total + '个)! 耗时' + totalTime + '秒. 继续下一关?';
 

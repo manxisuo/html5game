@@ -284,10 +284,12 @@
 		this.running = false;
 		this.clearCanvasFn = null;
 		this.interval = interval == undefined ? 50 : interval;
+		this.backupInterval = undefined;
 	}
 
 	/**
 	 * 增加一个动画.
+	 * 如果之前动画管理器没有启动, 将触发其启动.
 	 */
 	Manager.prototype.add = function(renderFn, type, config) {
 
@@ -334,7 +336,7 @@
 	}
 
 	/**
-	 * 启动动画管理器. 将开始所有动画.
+	 * 开始动画播放.
 	 */
 	Manager.prototype.start = function() {
 
@@ -350,7 +352,7 @@
 					me.clearCanvasFn();
 				}
 
-				// 渲染所有动画的帧. 
+				// 渲染所有动画的帧.
 				// 为了能够在循环中删除元素, 所以采用了逆序循环. 而添加元素时, 是放到数组开始的.
 				// 这样一来, 最后添加的动画将会位于顶层.
 				for ( var i = animations.length - 1; i >= 0; i--) {
@@ -378,6 +380,10 @@
 		}
 	};
 
+	/**
+	 * 停止动画播放.
+	 * 可通过start重新恢复.
+	 */
 	Manager.prototype.stop = function() {
 		var me = this;
 		if (me.running) {
@@ -387,6 +393,9 @@
 		}
 	};
 
+	/**
+	 * 重新设置每帧的持续时间.
+	 */
 	Manager.prototype.setInterval = function(interval) {
 		var me = this;
 		if (me.running) {
@@ -397,8 +406,57 @@
 		else {
 			me.interval = interval;
 		}
+
+		this.backupInterval = undefined;
 	};
 
+	/**
+	 * 改变动画的播放速度.
+	 * 
+	 * @param ratio 变速的比例. 大于1时加速, 小于1时减速, 等于1时速度不变.
+	 */
+	Manager.prototype.speedUp = function(ratio) {
+		var me = this;
+		
+		if (typeof ratio == 'number' && ratio > 0) {
+
+			if (ratio == 1 || ratio > 1 && this.interval == 1) { return; }
+
+			// 只有第一次调过speedUp时, 才进行备份. (在调restoreSpeed恢复速度后, 将重新计数.)
+			if (me.backupInterval == undefined) {
+				me.backupInterval = me.interval;
+			}
+
+			var newInterval = me.interval / ratio;
+			if (newInterval < 1) {
+				newInterval = 1;
+			}
+
+			// 使新的interval产生作用
+			if (me.running) {
+				me.stop();
+				me.interval = newInterval;
+				me.start();
+			}
+			else {
+				me.interval = newInterval;
+			}
+		}
+	};
+
+	/**
+	 * 恢复变速前的速度.
+	 */
+	Manager.prototype.restoreSpeed = function() {
+		if (this.backupInterval != undefined) {
+			this.setInterval(this.backupInterval);
+			this.backupInterval = undefined;
+		}
+	};
+
+	/**
+	 * 停止动画, 并清空动画列表.
+	 */
 	Manager.prototype.clear = function() {
 		this.stop();
 		this.animations = [];
