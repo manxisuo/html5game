@@ -288,8 +288,7 @@
 	}
 
 	/**
-	 * 增加一个动画.
-	 * 如果之前动画管理器没有启动, 将触发其启动.
+	 * 增加一个动画. 如果之前动画管理器没有启动, 将触发其启动.
 	 */
 	Manager.prototype.add = function(renderFn, type, config) {
 
@@ -303,7 +302,7 @@
 		}
 
 		if (animation.type == Animation.PERIOD) {
-			animation.times = animation.period / this.interval;
+			animation.times = Math.round(animation.period / this.interval);
 		}
 
 		this.animations.splice(0, 0, animation);
@@ -381,8 +380,7 @@
 	};
 
 	/**
-	 * 停止动画播放.
-	 * 可通过start重新恢复.
+	 * 停止动画播放. 可通过start重新恢复.
 	 */
 	Manager.prototype.stop = function() {
 		var me = this;
@@ -398,16 +396,23 @@
 	 */
 	Manager.prototype.setInterval = function(interval) {
 		var me = this;
-		if (me.running) {
-			me.stop();
-			me.interval = interval;
-			me.start();
-		}
-		else {
-			me.interval = interval;
-		}
 
-		this.backupInterval = undefined;
+		if (typeof interval == 'number' && interval > 0) {
+			if (interval < 1) {
+				interval = 1;
+			}
+
+			if (me.running) {
+				me.stop();
+				me.interval = interval;
+				me.start();
+			}
+			else {
+				me.interval = interval;
+			}
+
+			me.backupInterval = undefined;
+		}
 	};
 
 	/**
@@ -417,7 +422,7 @@
 	 */
 	Manager.prototype.speedUp = function(ratio) {
 		var me = this;
-		
+
 		if (typeof ratio == 'number' && ratio > 0) {
 
 			if (ratio == 1 || ratio > 1 && this.interval == 1) { return; }
