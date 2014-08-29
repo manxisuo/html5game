@@ -2,6 +2,44 @@
 	var Util = {};
 
 	/**
+	 * 返回N个数中的最小值. 至少需要提供一个参数.
+	 */
+	Util.min = function() {
+		if (arguments.length == 1) {
+			return arguments[0];
+		}
+		else {
+			var a = arguments[0];
+			var b = Util.min.apply(this, Array.prototype.slice.call(arguments, 1, arguments.length));
+
+			return a <= b ? a : b;
+		}
+	};
+	
+	/**
+	 * 返回N个数中的最大值. 至少需要提供一个参数.
+	 */
+	Util.max = function() {
+		if (arguments.length == 1) {
+			return arguments[0];
+		}
+		else {
+			var a = arguments[0];
+			var b = Util.max.apply(this, Array.prototype.slice.call(arguments, 1, arguments.length));
+
+			return a >= b ? a : b;
+		}
+	};
+	
+	Util.minArrayItem = function(array) {
+		return array.reduce(function(a, b){ return a <= b ? a: b; });
+	};
+	
+	Util.maxArrayItem = function(array) {
+		return array.reduce(function(a, b){ return a >= b ? a: b; });
+	};
+
+	/**
 	 * 返回整数min和整数max之间的某个随机整数. 包括min, 不包括max.
 	 */
 	Util.rndRange = function(min, max) {
@@ -39,13 +77,15 @@
 				angle = Math.atan(dy / dx);
 			else
 				angle = Math.atan(dy / dx) + 2 * PI;
-		} else if (dx == 0) {
+		}
+		else if (dx == 0) {
 			if (dy == 0)
 				angle = 0;
 			else
 				angle = Math.atan(dy / dx);
 			;
-		} else {
+		}
+		else {
 			angle = Math.atan(dy / dx) + PI;
 		}
 

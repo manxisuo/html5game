@@ -6,19 +6,12 @@
 	content="width=device-width; height=device-height; user-scaleable=no; initial-scale=1.0" />
 <meta name="apple-touch-fullscreen" content="YES" />
 
-<title>打小强</title>
+<title>微信新消息头像制作工具</title>
 
 <style type="text/css">
 html {
 	margin: 0;
 	padding: 0;
-}
-
-.initial_bg {
-	background: -webkit-gradient(linear, left top, right top, from(rgb(0, 137, 40)
-		), to(rgb(0, 137, 143) ) );
-	background: -moz-linear-gradient(left, rgb(0, 137, 40), rgb(0, 137, 143)
-		);
 }
 
 body {
@@ -27,13 +20,20 @@ body {
 	text-align: center;
 }
 
-#image_source,#bg_img {
+#file,#image,#icon,#canvas1,#exportLink,#resultImg {
 	display: none;
 }
 
-#canvas {
-	margin: auto;
-	border: 0px solid gray;
+#canvas_wrapper {
+	margin: 20px auto;
+}
+
+#canvas2, #canvas1 {
+	border: 1px solid gray;
+}
+
+#openFileBtn,#executeBtn {
+	margin-right: 15px;
 }
 </style>
 <link type="text/css" href="../style/popwin.css" media="all"
@@ -42,12 +42,21 @@ body {
 <script type="text/javascript" src="../script/util.js"></script>
 <script type="text/javascript" src="../script/popwin.js"></script>
 <script type="text/javascript" src="../script/mylib.js"></script>
-<script type="text/javascript" src="script/kxq-lib.js"></script>
 <script type="text/javascript" src="script/kxq.js"></script>
 
 </head>
-<body onload="main();">
-	<img id="image_source" src="image/xq.png" />
-	<canvas id="canvas" width="800" height="640"></canvas>
+<body>
+	<span id="fileSpan"><input type="file" accept="image/*" id="file" /></span>
+	<canvas id="canvas1" width="440" height="440"></canvas>
+	<img src="" id="image" width="640" height="640">
+	<img src="image/1.png" id="icon" width="50" height="50">
+
+	<div id="canvas_wrapper">
+		<canvas id="canvas2" width="300" height="300"></canvas>
+	</div>
+	<button id="openFileBtn">打开图片</button>
+	<button id="executeBtn">制作</button>
+	<button id="exportBtn">保存</button>
+	<!-- <a id="exportLink" href="" download="a.png">点击保存</a> -->
 </body>
 </html>

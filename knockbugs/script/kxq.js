@@ -159,7 +159,7 @@ function endLevel(totalTime) {
 
 	var tip = '恭喜你, 已全部消灭(共' + bug_total + '个)! 耗时' + totalTime + '秒. 继续下一关?';
 
-	PopWin.show(tip, function() {
+	PopWin.confirm('提示', tip, function() {
 		newLevel();
 	}, function() {
 		endGame();
