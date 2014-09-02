@@ -1,2 +1,9 @@
 .picasa.ini
 .picasaoriginals
+/WEB-INF
+/META-INF
+/makeAvatar/image/.picasaoriginals
+/knockbugs/image/.picasa.ini
+/knockbugs/image/.picasaoriginals
+/lib/jquery.mobile-1.4.3
+/test
