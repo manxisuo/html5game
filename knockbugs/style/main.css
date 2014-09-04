@@ -1,0 +1,38 @@
+html {
+	margin: 0;
+	padding: 0;
+}
+
+.initial_bg {
+	background: -webkit-gradient(linear, left top, right top, from(rgb(0, 137, 40)
+		), to(rgb(0, 137, 143) ) );
+	background: -moz-linear-gradient(left, rgb(0, 137, 40), rgb(0, 137, 143)
+		);
+}
+
+body {
+	margin: 0 auto;
+	padding: 0;
+	text-align: center;
+	overflow: hidden !important;
+}
+
+#image_source,#bg_img {
+	display: none;
+}
+
+#canvas {
+	margin: auto;
+	border: 0px solid gray;
+}
+
+/* for jquery mobile start */
+#pageone, body {
+	background-color: rgba(0, 0, 0, 0) !important;
+}
+
+#pageone .ui-content {
+	padding: 0;
+}
+
+/* for jquery mobile end */

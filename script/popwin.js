@@ -3,7 +3,7 @@
 
 	var win, header, msgField, yesBtn, cancelBtn, okBtn, mask;
 
-	PopWin.init = function() {
+	PopWin.init = function(renderTo) {
 		win = $('<div />').addClass('popwin-win');
 		win.width(300).height(200);
 		
@@ -19,7 +19,10 @@
 
 		mask = $('<div />').addClass('popwin-mask');
 
-		$(document.body).append(mask).append(win);
+		if (!renderTo) {
+			renderTo = $(document.body)
+		}
+		renderTo.append(mask).append(win);
 	};
 
 	PopWin.alert = function(title, message, callback) {

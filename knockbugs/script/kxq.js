@@ -31,7 +31,7 @@ function init() {
 
 	image = $('#image_source')[0];
 
-	PopWin.init();
+	PopWin.init($('#pageone'));
 
 	brush = new Brush(canvas.getContext('2d'));
 	manager = new AnimationManager(INTERVAL);
@@ -93,13 +93,15 @@ function checkKnock(e) {
 			bug.markKilled();
 		});
 
-		drawTip('击中' + knockedBugs.length + '个', x, y, 500);
+		drawTip('+' + knockedBugs.length, x, y, 500);
 	}
 }
 
 function drawTip(tip, x, y, period) {
+	var size = 20;
 	manager.add(function() {
-		brush.fillTextWithColor(tip, x, y, 'red', '20px Calibri');
+		brush.fillTextWithColor(tip, x, y, 'red', (size) + 'px Calibri');
+		size += 2;
 	}, Animation.PERIOD, {
 		period: period
 	});
@@ -140,7 +142,7 @@ function newLevel() {
 
 	// 加速
 	manager.speedUp(Math.pow(SPEED_RATIO, gameCount - 1));
-	
+
 	// 周期任务
 	manager.add(draw, Animation.CONTINOUS);
 
@@ -153,18 +155,22 @@ function endLevel(totalTime) {
 	canvas.removeEventListener('touchstart', checkKnock);
 
 	manager.clear();
-	
+
 	// 恢复速度
 	manager.restoreSpeed();
 
 	var tip = '恭喜你, 已全部消灭(共' + bug_total + '个)! 耗时' + totalTime + '秒. 继续下一关?';
 
-	PopWin.confirm('提示', tip, function() {
-		newLevel();
-	}, function() {
-		endGame();
-		drawWelcomePage();
-	});
+	setTimeout(function() {
+		brush.clear();
+		
+		PopWin.confirm('提示', tip, function() {
+			newLevel();
+		}, function() {
+			endGame();
+			drawWelcomePage();
+		});
+	}, 50);
 }
 
 /**
