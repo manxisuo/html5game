@@ -40,7 +40,7 @@
 		header.text(title);
 		msgField.html(message);
 
-		okBtn.unbind('click').on('click', function() {
+		okBtn.unbind('tap').on('tap', function() {
 			me.hide();
 			if (callback) {
 				callback();

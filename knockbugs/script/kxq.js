@@ -31,8 +31,12 @@ function init() {
 
 	image = $('#image_source')[0];
 
-	PopWin.init($('#pageone'));
+	PopWin.init();
 
+	$(canvas).on('touchstart', function(e) {
+		e.preventDefault();
+	});
+	
 	brush = new Brush(canvas.getContext('2d'));
 	manager = new AnimationManager(INTERVAL);
 	manager.setClearCanvasFn(function() {
@@ -64,11 +68,11 @@ function drawWelcomePage() {
 		e.preventDefault();
 
 		manager.clear();
-		canvas.removeEventListener('touchstart', fn);
+		$(canvas).unbind('tap');
 		newLevel();
 	};
 
-	canvas.addEventListener('touchstart', fn);
+	$(canvas).on('tap', fn);
 
 	resetBackground();
 }
@@ -81,9 +85,8 @@ function endGame() {
 function checkKnock(e) {
 	e.preventDefault();
 
-	var touch = e.targetTouches[0];
-	var x = touch.pageX - canvas.offsetLeft;
-	var y = touch.pageY - canvas.offsetTop;
+	var x = e.pageX - canvas.offsetLeft;
+	var y = e.pageY - canvas.offsetTop;
 	var knockedBugs = searchKnockedBug(x, y);
 
 	currentCount -= knockedBugs.length;
@@ -147,12 +150,12 @@ function newLevel() {
 	manager.add(draw, Animation.CONTINOUS);
 
 	// 增加监听器
-	canvas.addEventListener('touchstart', checkKnock);
+	$(canvas).on('tap', checkKnock);
 }
 
 function endLevel(totalTime) {
 	// 删除监听器
-	canvas.removeEventListener('touchstart', checkKnock);
+	$(canvas).unbind('tap');
 
 	manager.clear();
 
