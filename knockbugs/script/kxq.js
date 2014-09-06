@@ -136,7 +136,7 @@ function checkKnock(e) {
 
 	// 文字和声音提示
 	if (knockedBugs.length > 0) {
-		sound.pause();
+//		sound.pause();
 		sound.currentTime = 0;
 		sound.play();
 		
