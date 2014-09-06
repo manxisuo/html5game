@@ -1,7 +1,8 @@
 (function(window) {
 	var PopWin = {};
 
-	var win, header, msgField, yesBtn, cancelBtn, okBtn, mask;
+	var win, header, msgField, yesBtn, noBtn, okBtn, mask;
+	var yesCallback, noCallback, okCallback;
 
 	// 获取可视区域的高度.
 	// 在Nexus 7微信内置浏览器中测试发现, 用$(window).height()得到的值是0.
@@ -15,18 +16,20 @@
 	}
 
 	PopWin.init = function(renderTo) {
+		var me = this;
+		
 		win = $('<div />').addClass('popwin-win');
 		win.width(300).height(200);
 
 		header = $('<div />').addClass('popwin-header');
 		msgField = $('<div />').addClass('popwin-message');
 		yesBtn = $('<button />').addClass('popwin-yes').text('Yes');
-		cancelBtn = $('<button />').addClass('popwin-no').text('No');
+		noBtn = $('<button />').addClass('popwin-no').text('No');
 		okBtn = $('<button />').addClass('popwin-ok').text('OK');
 
 		win.append(header).append($('<hr />'));
 		win.append(msgField).append($('<hr />'));
-		win.append(yesBtn).append(cancelBtn).append(okBtn);
+		win.append(yesBtn).append(noBtn).append(okBtn);
 
 		mask = $('<div />').addClass('popwin-mask');
 
@@ -34,6 +37,27 @@
 			renderTo = $(document.body)
 		}
 		renderTo.append(mask).append(win);
+
+		okBtn.unbind('tap').on('tap', function() {
+			me.hide();
+			if (okCallback) {
+				okCallback();
+			}
+		});
+
+		yesBtn.unbind('tap').on('tap', function() {
+			me.hide();
+			if (yesCallback) {
+				yesCallback();
+			}
+		});
+
+		noBtn.unbind('tap').on('tap', function() {
+			me.hide();
+			if (noCallback) {
+				noCallback();
+			}
+		});
 	};
 
 	PopWin.alert = function(title, message, callback) {
@@ -52,15 +76,10 @@
 		header.text(title);
 		msgField.html(message);
 
-		okBtn.unbind('tap').on('tap', function() {
-			me.hide();
-			if (callback) {
-				callback();
-			}
-		});
-
+		okCallback = callback;
+		
 		yesBtn.hide();
-		cancelBtn.hide();
+		noBtn.hide();
 		okBtn.show();
 		win.show();
 		mask.show();
@@ -81,23 +100,12 @@
 		header.text(title);
 		msgField.html(message);
 
-		yesBtn.unbind('click').on('click', function() {
-			me.hide();
-			if (whenYes) {
-				whenYes();
-			}
-		});
-
-		cancelBtn.unbind('click').on('click', function() {
-			me.hide();
-			if (whenNo) {
-				whenNo();
-			}
-		});
-
+		yesCallback = whenYes;
+		noCallback = whenNo;
+		
 		okBtn.hide();
 		yesBtn.show();
-		cancelBtn.show();
+		noBtn.show();
 		win.show();
 		mask.show();
 	};

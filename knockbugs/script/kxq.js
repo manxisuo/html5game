@@ -1,6 +1,6 @@
 var canvas;
 
-var INTERVAL = 50;
+var INTERVAL = 25;
 var SPEED_RATIO = 1.02;
 var manager;
 
@@ -62,7 +62,7 @@ function drawWelcomePage() {
 		brush.strokeText('一起打小强', canvas.width / 2 - 125, 100, '50px sans-serif');
 
 		bug.render(brush);
-		bug.rotate(Math.PI / 20);
+		bug.rotate(Math.PI / (1000 / INTERVAL));
 
 	}, Animation.CONTINOUS);
 
@@ -110,10 +110,8 @@ function checkKnock(e) {
 }
 
 function drawTip(tip, x, y, period) {
-	var size = 20;
-	manager.add(function() {
-		brush.fillTextWithColor(tip, x, y, 'red', (size) + 'px Calibri');
-		size += 2;
+	manager.add(function(count, duration) {
+		brush.fillTextWithColor(tip, x, y, 'blue', (20 + count) + 'px Calibri');
 	}, Animation.PERIOD, {
 		period: period
 	});
@@ -199,7 +197,7 @@ function makeBug(bug) {
 	}
 
 	var angle = Util.getAngle(canvas.width / 2 - x, canvas.height / 2 - y);
-	var dr = 10;
+	var dr = INTERVAL / 5;
 	var dx = dr * Math.cos(angle);
 	var dy = dr * Math.sin(angle);
 
@@ -251,8 +249,8 @@ function draw() {
 function drawBug(bug) {
 	bug.render(brush, true);
 
-	if (Math.random() < 0.1) {
-		bug.turn(Util.rndAmong(1, -1) * Math.PI / Util.rndAmong(3, 4, 6));
+	if (Math.random() < 0.06) {
+		bug.turn(Util.rndAmong(1, -1) * Math.PI / Util.rndAmong(3, 4, 5, 6));
 	}
 	bug.move();
 }

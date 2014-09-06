@@ -217,9 +217,8 @@
 	};
 
 	/**
-	 * 画图.
-	 * image, x, y是必选的. rotate是可选的. width和height要么同时提供, 要么同时不提供.
-	 * 注意: x和y不是图片左上角的坐标, 是图片中心的坐标.
+	 * 画图. image, x, y是必选的. rotate是可选的. width和height要么同时提供, 要么同时不提供. 注意:
+	 * x和y不是图片左上角的坐标, 是图片中心的坐标.
 	 */
 	Brush.prototype.image = function(image, x, y, width, height, rotate) {
 		var ctx = this.ctx;
@@ -331,6 +330,12 @@
 			animation.times = Math.round(animation.period / this.interval);
 		}
 
+		// 表示已经执行了多少次(多少个帧)
+		animation.completedCount = 0;
+
+		// 表示动画开始执行时的时间
+		animation.startTime = -1;
+
 		this.animations.splice(0, 0, animation);
 
 		if (!this.running) {
@@ -360,6 +365,20 @@
 		return complete;
 	}
 
+	// 计算动画已经持续的时间
+	function calcDuration(current) {
+		var duration;
+		if (current.startTime == -1) {
+			current.startTime = new Date().getTime();
+			duration = 0;
+		}
+		else {
+			duration = new Date().getTime() - current.startTime;
+		}
+
+		return duration;
+	}
+
 	/**
 	 * 开始动画播放.
 	 */
@@ -369,6 +388,8 @@
 		var animations = me.animations;
 
 		var current;
+		var duration;
+
 		if (!me.running && animations.length > 0) {
 			me.timerId = setInterval(function() {
 
@@ -383,15 +404,18 @@
 				for ( var i = animations.length - 1; i >= 0; i--) {
 					current = animations[i];
 
+					duration = calcDuration(current);
+
 					if (checkCompleted(current)) {
 						if (current.afterStop) {
-							current.afterStop.apply(current.scope || window);
+							current.afterStop.call(current.scope || window, current.completedCount, duration);
 						}
 						animations.splice(i, 1);
 						continue;
 					}
 					else {
-						current.drawFn.apply(current.scope || window);
+
+						current.drawFn.call(current.scope || window, current.completedCount++, duration);
 					}
 				}
 
@@ -414,6 +438,16 @@
 			clearInterval(me.timerId);
 			me.timerId = -1;
 			me.running = false;
+		}
+
+		var animations = me.animations;
+		var current;
+		for ( var i = animations.length - 1; i >= 0; i--) {
+			current = animations[i];
+			duration = calcDuration(current);
+			if (current.afterStop) {
+				current.afterStop.call(current.scope || window, current.completedCount, duration);
+			}
 		}
 	};
 
