@@ -4,7 +4,6 @@ var sounds = [];
 var INTERVAL = 25;
 var SPEED_RATIO = 1.02;
 var zoom = 1; // 当前用户加速/减速的比例
-var zoomTip;
 var manager;
 
 // 全局数据
@@ -27,6 +26,31 @@ $(function() {
 function main() {
 	init();
 	drawWelcomePage();
+//	loadResources();
+}
+
+function loadResources() {
+	var imageRes =  Loader.register();
+	image.onload = function() {
+		imageRes.getReady();
+	}
+	
+	for (var i = 0; i < sounds.length; i++) {
+		sounds[i].onloadedmetadata = (function(soundRes) {
+			return function() {
+				soundRes.getReady();
+			}
+		})(Loader.register());
+	}
+	
+	Loader.progress(function(progress, completed) {
+//		drawTip(progress);
+//		console.log(new Date().getTime(), progress);
+		
+		if(completed) {
+			drawWelcomePage();
+		}
+	});
 }
 
 function init() {
@@ -53,7 +77,7 @@ function init() {
 
 		zoom *= 1.1;
 		manager.speedUp(1.1);
-		drawZoomTip('速度X' + Util.correctTo(zoom, 2), 10, canvas.height - 10, 500)
+		drawZoomTip('速度X' + Util.correctTo(zoom, 2))
 	});
 
 	$(canvas).on('swipeleft', function(e) {
@@ -61,7 +85,7 @@ function init() {
 
 		zoom /= 1.1;
 		manager.speedUp(1 / 1.1);
-		drawZoomTip('速度X' + Util.correctTo(zoom, 2), 10, canvas.height - 10, 500)
+		drawZoomTip('速度X' + Util.correctTo(zoom, 2))
 	});
 
 	$(canvas).on('taphold', function(e) {
@@ -70,7 +94,7 @@ function init() {
 		// 恢复原速率
 		manager.speedUp(1 / zoom);
 		zoom = 1;
-		drawZoomTip('速度X' + Util.correctTo(zoom, 2), 10, canvas.height - 10, 500)
+		drawZoomTip('速度X' + Util.correctTo(zoom, 2))
 	});
 
 	$(canvas).on('touchmove', function(e) {
@@ -84,29 +108,42 @@ function init() {
 	});
 }
 
-function drawZoomTip(tip, x, y, period) {
-	manager.remove(zoomTip);
-	zoomTip = manager.add(function(count, duration) {
-		brush.fillTextWithColor(tip, x, y, 'blue', 30 + 'px Calibri');
+function drawTip(tip) {
+	manager.add(function(count, duration) {
+		brush.fillTextWithColor(tip, 10, canvas.height - 10, 'blue', 30 + 'px Calibri');
 	}, Animation.PERIOD, {
-		period: period
+		period: 500
 	});
+}
+
+function drawZoomTip() {
+	var zoomTip;
+	
+	return function(tip) {
+		manager.remove(zoomTip);
+		zoomTip = manager.add(function(count, duration) {
+			brush.fillTextWithColor(tip, 10, canvas.height - 10, 'blue', 30 + 'px Calibri');
+		}, Animation.PERIOD, {
+			period: 500
+		});
+	}
 }
 
 function drawWelcomePage() {
 	var bug = new Bug({
 		x: canvas.width / 2,
-		y: canvas.height / 2,
+//		y: canvas.height / 2,
+		y: 200,
 		angle: -Math.PI / 2,
 		dx: 1,
 		dy: 1,
-		width: 200,
-		height: 200,
+		width: 150,
+		height: 150,
 		image: image,
 	});
 
 	manager.add(function() {
-		brush.strokeText('一起打小强', canvas.width / 2 - 125, 100, '50px sans-serif');
+		brush.strokeText('一起打小强', canvas.width / 2 - 125, 75, '50px sans-serif');
 
 		bug.render(brush);
 		bug.rotate(Math.PI / (1000 / INTERVAL));
@@ -159,7 +196,7 @@ function checkKnock(e) {
 			bug.markKilled();
 		});
 
-		drawTip('+' + knockedBugs.length, x, y, 500);
+		drawScoreTip('+' + knockedBugs.length, x, y);
 	}
 
 	// 判断是否已经全部消灭
@@ -170,11 +207,11 @@ function checkKnock(e) {
 	}
 }
 
-function drawTip(tip, x, y, period) {
+function drawScoreTip(tip, x, y) {
 	manager.add(function(count, duration) {
 		brush.fillTextWithColor(tip, x, y, 'blue', (20 + count) + 'px Calibri');
 	}, Animation.PERIOD, {
-		period: period
+		period: 500
 	});
 }
 
