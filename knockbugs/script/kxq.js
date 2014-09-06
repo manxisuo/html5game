@@ -1,5 +1,5 @@
 var canvas;
-var sound;
+var sounds = [];
 
 var INTERVAL = 25;
 var SPEED_RATIO = 1.02;
@@ -19,6 +19,10 @@ var bug_total = 0;
 var currentCount = bug_total;
 var startTime; // 本关卡开始时间
 
+$(function() {
+	main();
+});
+
 // 全局初始化
 function main() {
 	init();
@@ -30,7 +34,7 @@ function init() {
 	canvas.width = $(window).width();
 	canvas.height = $(window).height();
 
-	sound = $('#sound')[0]
+	sounds = $('.sound');
 
 	image = $('#image_source')[0];
 
@@ -127,6 +131,16 @@ function endGame() {
 	gameCount = 0;
 }
 
+function getSound() {
+	for (var i in sounds) {
+		if (sounds[i].paused) {
+			return sounds[i];
+		}
+	}
+	
+	return null;
+}
+
 function checkKnock(e) {
 	e.preventDefault();
 
@@ -136,10 +150,10 @@ function checkKnock(e) {
 
 	// 文字和声音提示
 	if (knockedBugs.length > 0) {
-		if (sound.currentTime != 0) {
-			sound.currentTime = 0;
+		var sound = getSound();
+		if (sound) {
+			sound.play(); 
 		}
-		sound.play();
 
 		knockedBugs.forEach(function(bug) {
 			bug.markKilled();
