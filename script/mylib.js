@@ -289,8 +289,8 @@
 	/**
 	 * config: times, period, util, afterStop, scope
 	 */
-	function Animation(renderFn, type, config) {
-		this.renderFn = renderFn || function() {
+	function Animation(drawFn, type, config) {
+		this.drawFn = drawFn || function() {
 		};
 		this.type = type || Animation.CONTINOUS;
 
@@ -317,7 +317,7 @@
 	/**
 	 * 增加一个动画. 如果之前动画管理器没有启动, 将触发其启动.
 	 */
-	Manager.prototype.add = function(renderFn, type, config) {
+	Manager.prototype.add = function(drawFn, type, config) {
 
 		var animation;
 
@@ -325,7 +325,7 @@
 			animation = arguments[0];
 		}
 		else {
-			animation = new Animation(renderFn, type, config);
+			animation = new Animation(drawFn, type, config);
 		}
 
 		if (animation.type == Animation.PERIOD) {
@@ -392,7 +392,7 @@
 						continue;
 					}
 					else {
-						current.renderFn.apply(current.scope || window);
+						current.drawFn.apply(current.scope || window);
 					}
 				}
 

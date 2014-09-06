@@ -95,6 +95,13 @@ function checkKnock(e) {
 
 	currentCount -= knockedBugs.length;
 
+	if (currentCount <= 0) {
+		var totalTime = Math.floor((new Date().getTime() - startTime) / 1000);
+		endLevel(totalTime);
+
+		return;
+	}
+
 	if (knockedBugs.length > 0) {
 		knockedBugs.forEach(function(bug) {
 			bug.markKilled();
@@ -161,23 +168,20 @@ function endLevel(totalTime) {
 	// 删除监听器
 	$(canvas).unbind('tap');
 
+	// 停止动画并重置速度
 	manager.clear();
-
-	// 恢复速度
 	manager.restoreSpeed();
 
 	var tip = '恭喜你, 已全部消灭(共' + bug_total + '个)! 耗时' + totalTime + '秒. 继续下一关?';
 
-	setTimeout(function() {
-		brush.clear();
+	brush.clear();
 
-		PopWin.confirm('提示', tip, function() {
-			newLevel();
-		}, function() {
-			endGame();
-			drawWelcomePage();
-		});
-	}, 50);
+	PopWin.confirm('提示', tip, function() {
+		newLevel();
+	}, function() {
+		endGame();
+		drawWelcomePage();
+	});
 }
 
 /**
@@ -243,11 +247,6 @@ function draw() {
 			}
 			drawBug(bugs[i]);
 		}
-	}
-
-	if (currentCount <= 0) {
-		var totalTime = Math.floor((new Date().getTime() - startTime) / 1000);
-		endLevel(totalTime);
 	}
 }
 
