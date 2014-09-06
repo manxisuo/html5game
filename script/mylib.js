@@ -450,6 +450,17 @@
 			}
 		}
 	};
+	
+	Manager.prototype.remove = function(animation) {
+		var animations = this.animations;
+		for ( var i = animations.length - 1; i >= 0; i--) {
+			if (animations[i] == animation) {
+				animations.splice(i, 1);
+				
+				break;
+			}
+		}
+	}
 
 	/**
 	 * 重新设置每帧的持续时间.

@@ -104,6 +104,11 @@
 		});
 		array.splice(index, 1);
 	};
+	
+	Util.correctTo = function(number, n) {
+		var zoom = Math.pow(10, n);
+		return Math.round(zoom * number) / zoom;
+	};
 
 	window.Util = Util;
 })(window);

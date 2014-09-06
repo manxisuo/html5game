@@ -2,6 +2,8 @@ var canvas;
 
 var INTERVAL = 25;
 var SPEED_RATIO = 1.02;
+var zoom = 1; // 当前用户加速/减速的比例
+var zoomTip;
 var manager;
 
 // 全局数据
@@ -39,10 +41,48 @@ function init() {
 		e.preventDefault();
 	});
 
+	$(canvas).on('swiperight', function(e) {
+		e.preventDefault();
+
+		zoom *= 1.1;
+		manager.speedUp(1.1);
+		drawZoomTip('速度X' + Util.correctTo(zoom, 2), 10, canvas.height - 10, 500)
+	});
+
+	$(canvas).on('swipeleft', function(e) {
+		e.preventDefault();
+
+		zoom /= 1.1;
+		manager.speedUp(1 / 1.1);
+		drawZoomTip('速度X' + Util.correctTo(zoom, 2), 10, canvas.height - 10, 500)
+	});
+
+	$(canvas).on('taphold', function(e) {
+		e.preventDefault();
+
+		// 恢复原速率
+		manager.speedUp(1 / zoom);
+		zoom = 1;
+		drawZoomTip('速度X' + Util.correctTo(zoom, 2), 10, canvas.height - 10, 500)
+	});
+
+	$(canvas).on('touchmove', function(e) {
+		e.preventDefault();
+	});
+
 	brush = new Brush(canvas.getContext('2d'));
 	manager = new AnimationManager(INTERVAL);
 	manager.setClearCanvasFn(function() {
 		brush.clear();
+	});
+}
+
+function drawZoomTip(tip, x, y, period) {
+	manager.remove(zoomTip);
+	zoomTip = manager.add(function(count, duration) {
+		brush.fillTextWithColor(tip, x, y, 'blue', 30 + 'px Calibri');
+	}, Animation.PERIOD, {
+		period: period
 	});
 }
 
@@ -139,6 +179,7 @@ function newLevel() {
 	gameCount++;
 	bug_total = gameCount * 2;
 	currentCount = bug_total;
+	zoom = 1;
 
 	bugs = [];
 	for ( var i = 0; i < bug_total; i++) {
