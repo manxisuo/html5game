@@ -136,10 +136,11 @@ function checkKnock(e) {
 
 	// 文字和声音提示
 	if (knockedBugs.length > 0) {
-//		sound.pause();
-		sound.currentTime = 0;
+		if (sound.currentTime != 0) {
+			sound.currentTime = 0;
+		}
 		sound.play();
-		
+
 		knockedBugs.forEach(function(bug) {
 			bug.markKilled();
 		});
