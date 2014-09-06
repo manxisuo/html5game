@@ -17,7 +17,7 @@ body {
 	overflow: hidden !important;
 }
 
-#image_source,#bg_img {
+#image_source,#bg_img,#sound {
 	display: none;
 }
 
@@ -27,7 +27,7 @@ body {
 }
 
 /* for jquery mobile start */
-#pageone, body {
+#pageone,body {
 	background-color: rgba(0, 0, 0, 0) !important;
 }
 

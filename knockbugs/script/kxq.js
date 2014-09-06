@@ -1,4 +1,5 @@
 var canvas;
+var sound;
 
 var INTERVAL = 25;
 var SPEED_RATIO = 1.02;
@@ -28,6 +29,8 @@ function init() {
 	canvas = $('#canvas')[0];
 	canvas.width = $(window).width();
 	canvas.height = $(window).height();
+
+	sound = $('#sound')[0]
 
 	image = $('#image_source')[0];
 
@@ -131,21 +134,24 @@ function checkKnock(e) {
 	var y = e.pageY - canvas.offsetTop;
 	var knockedBugs = searchKnockedBug(x, y);
 
-	currentCount -= knockedBugs.length;
-
-	if (currentCount <= 0) {
-		var totalTime = Math.floor((new Date().getTime() - startTime) / 1000);
-		endLevel(totalTime);
-
-		return;
-	}
-
+	// 文字和声音提示
 	if (knockedBugs.length > 0) {
+		sound.pause();
+		sound.currentTime = 0;
+		sound.play();
+		
 		knockedBugs.forEach(function(bug) {
 			bug.markKilled();
 		});
 
 		drawTip('+' + knockedBugs.length, x, y, 500);
+	}
+
+	// 判断是否已经全部消灭
+	currentCount -= knockedBugs.length;
+	if (currentCount <= 0) {
+		var totalTime = Math.floor((new Date().getTime() - startTime) / 1000);
+		endLevel(totalTime);
 	}
 }
 
