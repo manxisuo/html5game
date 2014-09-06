@@ -24,10 +24,8 @@ function main() {
 
 function init() {
 	canvas = $('#canvas')[0];
-	canvas.width = window.screen.availWidth;
-	canvas.height = window.screen.availHeight;
-	// canvas.width = document.body.clientWidth;
-	// canvas.height = document.body.clientHeight;
+	canvas.width = $(window).width();
+	canvas.height =  $(window).height();
 
 	image = $('#image_source')[0];
 
