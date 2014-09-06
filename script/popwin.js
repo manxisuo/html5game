@@ -3,6 +3,17 @@
 
 	var win, header, msgField, yesBtn, cancelBtn, okBtn, mask;
 
+	// 获取可视区域的高度.
+	// 在Nexus 7微信内置浏览器中测试发现, 用$(window).height()得到的值是0.
+	function getWindowHeight() {
+		var h = $(window).height();
+		if (h == 0) {
+			h = window.innerHeight;
+		}
+
+		return h;
+	}
+
 	PopWin.init = function(renderTo) {
 		win = $('<div />').addClass('popwin-win');
 		win.width(300).height(200);
@@ -28,10 +39,8 @@
 	PopWin.alert = function(title, message, callback) {
 		var me = this;
 
-		// var left = (window.screen.availWidth - win.width()) / 2;
-		// var top = (window.screen.availHeight - win.height()) / 2;
 		var left = ($(window).width() - win.width()) / 2;
-		var top = ($(window).height() - win.height()) / 2;
+		var top = (getWindowHeight() - win.height()) / 2;
 
 		win.css({
 			left: left + 'px',
@@ -60,10 +69,8 @@
 	PopWin.confirm = function(title, message, whenYes, whenNo) {
 		var me = this;
 
-		// var left = (window.screen.availWidth - win.width()) / 2;
-		// var top = (window.screen.availHeight - win.height()) / 2;
 		var left = ($(window).width() - win.width()) / 2;
-		var top = ($(window).height() - win.height()) / 2;
+		var top = (getWindowHeight() - win.height()) / 2;
 		win.css({
 			left: left + 'px',
 			top: top + 'px',

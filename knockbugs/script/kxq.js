@@ -25,7 +25,7 @@ function main() {
 function init() {
 	canvas = $('#canvas')[0];
 	canvas.width = $(window).width();
-	canvas.height =  $(window).height();
+	canvas.height = $(window).height();
 
 	image = $('#image_source')[0];
 

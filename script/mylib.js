@@ -217,7 +217,7 @@
 	};
 
 	/**
-	 * 画图. 
+	 * 画图.
 	 * image, x, y是必选的. rotate是可选的. width和height要么同时提供, 要么同时不提供.
 	 * 注意: x和y不是图片左上角的坐标, 是图片中心的坐标.
 	 */
@@ -254,31 +254,30 @@
 
 		return this;
 	};
-	
+
 	Brush.prototype.sliceImage = function(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
 		this.ctx.drawImage.apply(this.ctx, arguments);
 	};
-	
+
 	Brush.prototype.translate = function() {
 		this.ctx.translate.apply(this.ctx, arguments);
 	};
-	
+
 	Brush.prototype.rotate = function() {
 		this.ctx.rotate.apply(this.ctx, arguments);
 	};
-	
+
 	Brush.prototype.transform = function() {
 		this.ctx.transform.apply(this.ctx, arguments);
 	};
-	
+
 	Brush.prototype.save = function() {
 		this.ctx.save.apply(this.ctx, arguments);
 	};
-	
+
 	Brush.prototype.restore = function() {
 		this.ctx.restore.apply(this.ctx, arguments);
 	};
-
 
 	window.Brush = Brush;
 
