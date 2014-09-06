@@ -36,7 +36,11 @@ function init() {
 	$(canvas).on('touchstart', function(e) {
 		e.preventDefault();
 	});
-	
+
+	$(document).on('scrollstart', function(e) {
+		e.preventDefault();
+	});
+
 	brush = new Brush(canvas.getContext('2d'));
 	manager = new AnimationManager(INTERVAL);
 	manager.setClearCanvasFn(function() {
@@ -166,7 +170,7 @@ function endLevel(totalTime) {
 
 	setTimeout(function() {
 		brush.clear();
-		
+
 		PopWin.confirm('提示', tip, function() {
 			newLevel();
 		}, function() {
