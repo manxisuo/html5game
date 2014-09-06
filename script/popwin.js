@@ -6,7 +6,7 @@
 	PopWin.init = function(renderTo) {
 		win = $('<div />').addClass('popwin-win');
 		win.width(300).height(200);
-		
+
 		header = $('<div />').addClass('popwin-header');
 		msgField = $('<div />').addClass('popwin-message');
 		yesBtn = $('<button />').addClass('popwin-yes').text('Yes');
@@ -28,8 +28,11 @@
 	PopWin.alert = function(title, message, callback) {
 		var me = this;
 
-		var left = (window.screen.availWidth - win.width()) / 2;
-		var top = (window.screen.availHeight - win.height()) / 2;
+		// var left = (window.screen.availWidth - win.width()) / 2;
+		// var top = (window.screen.availHeight - win.height()) / 2;
+		var left = ($(window).width() - win.width()) / 2;
+		var top = ($(window).height() - win.height()) / 2;
+
 		win.css({
 			left: left + 'px',
 			top: top + 'px',
@@ -46,7 +49,7 @@
 				callback();
 			}
 		});
-		
+
 		yesBtn.hide();
 		cancelBtn.hide();
 		okBtn.show();
@@ -57,8 +60,10 @@
 	PopWin.confirm = function(title, message, whenYes, whenNo) {
 		var me = this;
 
-		var left = (window.screen.availWidth - win.width()) / 2;
-		var top = (window.screen.availHeight - win.height()) / 2;
+		// var left = (window.screen.availWidth - win.width()) / 2;
+		// var top = (window.screen.availHeight - win.height()) / 2;
+		var left = ($(window).width() - win.width()) / 2;
+		var top = ($(window).height() - win.height()) / 2;
 		win.css({
 			left: left + 'px',
 			top: top + 'px',
