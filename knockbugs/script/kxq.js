@@ -18,7 +18,7 @@ var bug_total = 0;
 var currentCount = bug_total;
 var startTime; // 本关卡开始时间
 
-$(function() {
+$(document).on("pageinit", function() {
 	main();
 });
 
@@ -26,7 +26,7 @@ $(function() {
 function main() {
 	init();
 	drawWelcomePage();
-//	loadResources();
+// loadResources();
 }
 
 function loadResources() {
@@ -44,8 +44,8 @@ function loadResources() {
 	}
 	
 	Loader.progress(function(progress, completed) {
-//		drawTip(progress);
-//		console.log(new Date().getTime(), progress);
+// drawTip(progress);
+// console.log(new Date().getTime(), progress);
 		
 		if(completed) {
 			drawWelcomePage();
@@ -116,7 +116,7 @@ function drawTip(tip) {
 	});
 }
 
-function drawZoomTip() {
+var drawZoomTip = (function() {
 	var zoomTip;
 	
 	return function(tip) {
@@ -127,12 +127,12 @@ function drawZoomTip() {
 			period: 500
 		});
 	}
-}
+})();
 
 function drawWelcomePage() {
 	var bug = new Bug({
 		x: canvas.width / 2,
-//		y: canvas.height / 2,
+// y: canvas.height / 2,
 		y: 200,
 		angle: -Math.PI / 2,
 		dx: 1,
@@ -187,10 +187,10 @@ function checkKnock(e) {
 
 	// 文字和声音提示
 	if (knockedBugs.length > 0) {
-		var sound = getSound();
-		if (sound) {
-			sound.play(); 
-		}
+//		var sound = getSound();
+//		if (sound) {
+//			sound.play(); 
+//		}
 
 		knockedBugs.forEach(function(bug) {
 			bug.markKilled();
@@ -210,8 +210,8 @@ function checkKnock(e) {
 function drawScoreTip(tip, x, y) {
 	manager.add(function(count, duration) {
 		brush.fillTextWithColor(tip, x, y, 'blue', (20 + count) + 'px Calibri');
-	}, Animation.PERIOD, {
-		period: 500
+	}, Animation.TIMES, {
+		times: 20
 	});
 }
 
@@ -267,7 +267,8 @@ function endLevel(totalTime) {
 	manager.clear();
 	manager.restoreSpeed();
 
-	var tip = '恭喜你, 已全部消灭(共' + bug_total + '个)! 耗时' + totalTime + '秒. 继续下一关?';
+	var tip = '恭喜你, 共消灭' + bug_total + '个! 耗时' + totalTime + '秒.';
+	tip += '<br />继续下一关?';
 
 	brush.clear();
 

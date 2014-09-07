@@ -15,17 +15,23 @@
 		return h;
 	}
 
+	function invokeCallback(callback) {
+		if (callback) {
+			callback();
+		}
+	}
+
 	PopWin.init = function(renderTo) {
 		var me = this;
-		
+
 		win = $('<div />').addClass('popwin-win');
 		win.width(300).height(200);
 
 		header = $('<div />').addClass('popwin-header');
 		msgField = $('<div />').addClass('popwin-message');
-		yesBtn = $('<button />').addClass('popwin-yes').text('Yes');
-		noBtn = $('<button />').addClass('popwin-no').text('No');
-		okBtn = $('<button />').addClass('popwin-ok').text('OK');
+		yesBtn = $('<button />').addClass('popwin-yes').text('确定');
+		noBtn = $('<button />').addClass('popwin-no').text('取消');
+		okBtn = $('<button />').addClass('popwin-ok').text('确定');
 
 		win.append(header).append($('<hr />'));
 		win.append(msgField).append($('<hr />'));
@@ -36,27 +42,19 @@
 		if (!renderTo) {
 			renderTo = $(document.body)
 		}
+
 		renderTo.append(mask).append(win);
 
 		okBtn.unbind('tap').on('tap', function() {
-			me.hide();
-			if (okCallback) {
-				okCallback();
-			}
+			me.hide(okCallback);
 		});
 
 		yesBtn.unbind('tap').on('tap', function() {
-			me.hide();
-			if (yesCallback) {
-				yesCallback();
-			}
+			me.hide(yesCallback);
 		});
 
 		noBtn.unbind('tap').on('tap', function() {
-			me.hide();
-			if (noCallback) {
-				noCallback();
-			}
+			me.hide(noCallback);
 		});
 	};
 
@@ -77,12 +75,13 @@
 		msgField.html(message);
 
 		okCallback = callback;
-		
+
 		yesBtn.hide();
 		noBtn.hide();
 		okBtn.show();
-		win.show();
-		mask.show();
+
+		win.fadeIn(500);
+		mask.fadeIn(500);
 	};
 
 	PopWin.confirm = function(title, message, whenYes, whenNo) {
@@ -102,17 +101,18 @@
 
 		yesCallback = whenYes;
 		noCallback = whenNo;
-		
+
 		okBtn.hide();
 		yesBtn.show();
 		noBtn.show();
-		win.show();
-		mask.show();
+
+		win.fadeIn(500);
+		mask.fadeIn(500);
 	};
 
-	PopWin.hide = function() {
-		win.hide();
-		mask.hide();
+	PopWin.hide = function(callback) {
+		win.fadeOut(250);
+		mask.fadeOut(250, callback);
 	};
 
 	window.PopWin = PopWin;
