@@ -1,7 +1,7 @@
 // require: Util (util.js)
 function Bug(config) {
 	this.brush = brush;
-	Util.merge(this, {
+	Util.copy(this, {
 		x: 0,
 		y: 0,
 		angle: 0,
@@ -13,7 +13,7 @@ function Bug(config) {
 		countdown: Util.rndRange(10, 20),
 		killed: false,
 	});
-	Util.merge(this, config);
+	Util.copy(this, config);
 }
 
 Bug.prototype.move = function() {

@@ -19,7 +19,7 @@ var currentCount = bug_total;
 var startTime; // 本关卡开始时间
 
 $(document).on("pageinit", function() {
-	main();
+	Loader.loadConfig('config.json', main)
 });
 
 // 全局初始化
@@ -187,10 +187,10 @@ function checkKnock(e) {
 
 	// 文字和声音提示
 	if (knockedBugs.length > 0) {
-//		var sound = getSound();
-//		if (sound) {
-//			sound.play(); 
-//		}
+// var sound = getSound();
+// if (sound) {
+// sound.play();
+// }
 
 		knockedBugs.forEach(function(bug) {
 			bug.markKilled();
@@ -310,7 +310,7 @@ function makeBug(bug) {
 	};
 
 	if (bug) {
-		Util.merge(bug, config);
+		Util.copy(bug, config);
 		return bug;
 	}
 	else {

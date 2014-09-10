@@ -15,12 +15,6 @@
 		return h;
 	}
 
-	function invokeCallback(callback) {
-		if (callback) {
-			callback();
-		}
-	}
-
 	PopWin.init = function(renderTo) {
 		var me = this;
 

@@ -295,7 +295,7 @@
 		this.times = 0;
 		this.period = 0;
 
-		Util.merge(this, config);
+		Util.copy(this, config);
 	}
 
 	Animation.CONTINOUS = 1;

@@ -1,3 +1,16 @@
+/**
+ * 使用jquery mobile实现的弹窗。 
+ * 虽然看起来是弹窗形式，但是实际上类似于发生了页面跳转，所以当关闭该弹窗时，
+ * 父页面会刷新，所以跟通常的弹窗不一样。使用时要注意。 
+ * 
+ * TODO 后续研究一下怎样能够避免父页面刷新。
+ * 
+ * 注意：要在页面pagecreate事件的处理器中调用PopWin2.init()，即
+ * $(document).on('pagecreate', function() {
+ *     PopWin2.init();
+ * })
+ */
+
 (function(window) {
 	var PopWin = {};
 	var pageId;
